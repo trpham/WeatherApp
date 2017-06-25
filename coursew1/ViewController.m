@@ -16,7 +16,7 @@
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (nonatomic) NSArray *datas;
+@property (nonatomic) NSArray *data;
 
 @end
 
@@ -28,7 +28,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    self.datas = @[];
+    self.data = @[];
     
     self.tableView.dataSource = self;
     // Hanlde Event, will return listeners (delegates)
@@ -39,12 +39,40 @@
 //        [self.tableView reloadData];
 //    }];
 //    
-//    12,32,15,37,10
     
-    [[OWClient client] getWeatherDataWithBBOXInfo:@"12,32,15,37,10" withCompleton: ^(NSArray <OWCityData *> *datas) {
-        self.datas = datas;
+    [[OWClient client] getWeatherDataWithBBOXInfo:@"12,32,15,37,10" withCompleton: ^(NSArray <OWCityData *> *data) {
+        self.data = data;
         [self.tableView reloadData];
     }];
+}
+
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.data.count;
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    NSLog(@"row %ld", indexPath.row);
+}
+
+
+// Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
+// Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:weatherTableViewCellID];
+    WeatherTableViewCell *weatherCell = (WeatherTableViewCell *) cell;
+    
+    OWCityData *data = self.data[indexPath.row];
+    
+    weatherCell.cityNameLabel.text = data.cityName;
+    weatherCell.cityTempLabel.text = [NSString stringWithFormat:@"%@*C", data.main.temp];
+    weatherCell.cityTempDescriptionLabel.text = [NSString stringWithFormat:@"%@", data.weather.main];
+    [weatherCell.weatherIcon setImageWithURL:[data.weather getWeatherIconURL]];
+    
+    return weatherCell;
 }
 
 
@@ -53,28 +81,5 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.datas.count;
-}
-
-// Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
-// Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kWeatherTableViewCell];
-    WeatherTableViewCell *customCell = (WeatherTableViewCell *) cell;
-    
-    OWCityData * data = self.datas[indexPath.row];
-    
-    customCell.cityNameLabel.text = data.cityName;
-    customCell.cityTempLabel.text = [NSString stringWithFormat:@"%@*C", data.main.temp];
-    [customCell.weatherIcon setImageWithURL:[data.weather getWeatherIconURL]];
-    
-    return customCell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"row %ld", indexPath.row);
-}
 
 @end

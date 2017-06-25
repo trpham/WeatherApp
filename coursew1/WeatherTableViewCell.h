@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-static NSString * kWeatherTableViewCell = @"myCell";
+static NSString *weatherTableViewCellID = @"weatherCell";
 
 @interface WeatherTableViewCell : UITableViewCell
+
 @property (weak, nonatomic) IBOutlet UILabel *cityNameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *cityTempLabel;
+@property (weak, nonatomic) IBOutlet UILabel *cityTempDescriptionLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *weatherIcon;
 
 @end
